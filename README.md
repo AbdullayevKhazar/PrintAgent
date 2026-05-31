@@ -6,7 +6,7 @@ PrinterAgent Windows ucun printer agent proqramidir. Proqram kompüterdə işlə
 
 Hazir `.exe` faylini GitHub Releases bolmesinden yukleyin:
 
-[PrinterAgent.exe yukle](https://github.com/USERNAME/PrinterAgent/releases/latest/download/PrinterAgent.exe)
+[PrinterAgent.exe yukle](https://github.com/AbdullayevKhazar/PrintAgent/releases/download/v0.1.0/Printer.Agent-Setup-0.1.0.exe)
 
 > Qeyd: `USERNAME` hissəsini öz GitHub istifadəçi adınızla dəyişin. Məsələn: `https://github.com/abdul/PrinterAgent/releases/latest/download/PrinterAgent.exe`
 
