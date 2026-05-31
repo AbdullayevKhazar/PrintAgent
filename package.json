@@ -1,0 +1,59 @@
+{
+  "name": "printer-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "main.js",
+  "scripts": {
+    "start": "node scripts/start-electron.js",
+    "package:win": "node scripts/package-win.js",
+    "dist:win": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& electron-builder --win nsis&& node scripts/clean-dist.js",
+    "startup:install": "node scripts/startup.js install",
+    "startup:uninstall": "node scripts/startup.js uninstall",
+    "startup:status": "node scripts/startup.js status",
+    "print-agent": "node local-print-agent/server.js",
+    "print-agent:list-printers": "node local-print-agent/server.js --list-printers"
+  },
+  "build": {
+    "appId": "az.nextcross.printer-agent",
+    "productName": "Printer Agent",
+    "asar": false,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "main.js",
+      "preload.cjs",
+      "dashboard.html",
+      "print-queue-worker.js",
+      "package.json",
+      "docs/**/*",
+      "local-print-agent/**/*"
+    ],
+    "win": {
+      "signAndEditExecutable": false,
+      "target": [
+        {
+          "target": "nsis",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    },
+    "nsis": {
+      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "runAfterFinish": true
+    }
+  },
+  "devDependencies": {
+    "electron": "^42.3.0",
+    "electron-builder": "^26.8.1"
+  }
+}

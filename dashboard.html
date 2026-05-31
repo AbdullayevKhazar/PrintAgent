@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="az">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NextCross Print Agent</title>
+    <style>
+      :root {
+        font-family:
+          Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+          "Segoe UI", sans-serif;
+        background: #f6f8fb;
+        color: #172033;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+      }
+
+      main {
+        width: min(720px, calc(100vw - 32px));
+        border: 1px solid #d8e1ed;
+        border-radius: 8px;
+        background: #ffffff;
+        padding: 28px;
+        box-shadow: 0 10px 30px rgba(28, 39, 64, 0.08);
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 28px;
+        line-height: 1.15;
+      }
+
+      .lead {
+        margin: 14px 0 0;
+        color: #52637a;
+        font-size: 16px;
+        line-height: 1.6;
+      }
+
+      .status {
+        display: flex;
+        align-items: flex-start;
+        gap: 12px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #e4ebf3;
+      }
+
+      .dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 999px;
+        margin-top: 4px;
+        background: #d97706;
+        box-shadow: 0 0 0 5px rgba(217, 119, 6, 0.16);
+        flex: 0 0 auto;
+      }
+
+      .ok {
+        background: #16a34a;
+        box-shadow: 0 0 0 5px rgba(22, 163, 74, 0.16);
+      }
+
+      .bad {
+        background: #dc2626;
+        box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.14);
+      }
+
+      .title {
+        font-weight: 750;
+      }
+
+      .note {
+        margin-top: 4px;
+        color: #63738a;
+        font-size: 14px;
+        line-height: 1.45;
+      }
+
+      @media (max-width: 560px) {
+        body {
+          place-items: start center;
+        }
+
+        main {
+          margin-top: 18px;
+          padding: 22px;
+        }
+
+        h1 {
+          font-size: 24px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>NextCross Print Agent</h1>
+      <p class="lead">
+        Bu proqram NextCross sistemindən gələn qəbzləri kassadakı thermal
+        printerə ötürür. Pəncərə bağlansa da agent arxa planda işləməyə davam
+        edir və kompüter açılanda avtomatik başlayır.
+      </p>
+
+      <div class="status">
+        <span id="agent-dot" class="dot"></span>
+        <div>
+          <div id="agent-title" class="title">Status yoxlanılır...</div>
+          <div id="agent-note" class="note">Çap servisi hazırlanır.</div>
+        </div>
+      </div>
+    </main>
+
+    <script>
+      const agentDot = document.getElementById("agent-dot");
+
+      function setText(id, value) {
+        document.getElementById(id).textContent =
+          value === undefined || value === null || value === "" ? "-" : value;
+      }
+
+      function setDot(state) {
+        agentDot.className = `dot ${state}`;
+      }
+
+      async function loadStatus() {
+        try {
+          const status = await window.nextcrossAgent.getStatus();
+
+          if (status.bridge.ok) {
+            setDot("ok");
+            setText("agent-title", "Agent işləyir");
+            setText(
+              "agent-note",
+              "Qəbz çapları qəbul olunur. Bu pəncərəni bağlaya bilərsiniz.",
+            );
+          } else {
+            setDot("bad");
+            setText("agent-title", "Agent cavab vermir");
+            setText("agent-note", status.bridge.error || "Health alınmadı");
+          }
+        } catch (error) {
+          setDot("bad");
+          setText("agent-title", "Status oxunmadı");
+          setText("agent-note", error?.message || String(error));
+        }
+      }
+
+      loadStatus();
+      setInterval(loadStatus, 5000);
+    </script>
+  </body>
+</html>

@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="az">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>PrinterAgent yukle</title>
+    <style>
+      :root {
+        color-scheme: light;
+        font-family: Arial, sans-serif;
+        background: #f4f6f8;
+        color: #151a1f;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: grid;
+        place-items: center;
+      }
+
+      main {
+        width: min(92vw, 520px);
+        padding: 32px;
+        background: #ffffff;
+        border: 1px solid #d9e0e7;
+        border-radius: 8px;
+        box-shadow: 0 14px 40px rgba(20, 30, 40, 0.08);
+      }
+
+      h1 {
+        margin: 0 0 12px;
+        font-size: 32px;
+        line-height: 1.2;
+      }
+
+      p {
+        margin: 0 0 24px;
+        line-height: 1.6;
+        color: #48525c;
+      }
+
+      button {
+        width: 100%;
+        min-height: 48px;
+        border: 0;
+        border-radius: 6px;
+        background: #1167b1;
+        color: #ffffff;
+        font-size: 16px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      button:hover {
+        background: #0d5798;
+      }
+
+      small {
+        display: block;
+        margin-top: 16px;
+        color: #68737d;
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>PrinterAgent</h1>
+      <p>Windows ucun PrinterAgent proqramini yuklemek ucun asagidaki duymeye klik edin.</p>
+      <button type="button" onclick="downloadExe()">PrinterAgent.exe yukle</button>
+      <small>Fayl GitHub Releases bolmesinden yuklenir.</small>
+    </main>
+
+    <script>
+      function downloadExe() {
+        window.location.href =
+          "https://github.com/USERNAME/PrinterAgent/releases/latest/download/PrinterAgent.exe";
+      }
+    </script>
+  </body>
+</html>
