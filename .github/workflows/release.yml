@@ -26,6 +26,6 @@ jobs:
         run: npm install
 
       - name: Publish Windows release
-        run: npm run release:win
+        run: npm run dist:win
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
