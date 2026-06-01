@@ -25,7 +25,7 @@
       }
 
       main {
-        width: min(720px, calc(100vw - 32px));
+        width: min(760px, calc(100vw - 32px));
         border: 1px solid #d8e1ed;
         border-radius: 8px;
         background: #ffffff;
@@ -46,13 +46,18 @@
         line-height: 1.6;
       }
 
+      .status-list {
+        display: grid;
+        gap: 18px;
+        margin-top: 24px;
+        padding-top: 20px;
+        border-top: 1px solid #e4ebf3;
+      }
+
       .status {
         display: flex;
         align-items: flex-start;
         gap: 12px;
-        margin-top: 24px;
-        padding-top: 20px;
-        border-top: 1px solid #e4ebf3;
       }
 
       .dot {
@@ -75,6 +80,11 @@
         box-shadow: 0 0 0 5px rgba(220, 38, 38, 0.14);
       }
 
+      .info {
+        background: #2563eb;
+        box-shadow: 0 0 0 5px rgba(37, 99, 235, 0.14);
+      }
+
       .title {
         font-weight: 750;
       }
@@ -84,6 +94,37 @@
         color: #63738a;
         font-size: 14px;
         line-height: 1.45;
+      }
+
+      .actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 12px;
+      }
+
+      button {
+        min-height: 36px;
+        border: 1px solid #cad5e4;
+        border-radius: 6px;
+        background: #ffffff;
+        color: #172033;
+        font: inherit;
+        font-size: 14px;
+        font-weight: 650;
+        padding: 0 14px;
+        cursor: pointer;
+      }
+
+      button.primary {
+        border-color: #2563eb;
+        background: #2563eb;
+        color: #ffffff;
+      }
+
+      button:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
       }
 
       @media (max-width: 560px) {
@@ -106,30 +147,71 @@
     <main>
       <h1>NextCross Print Agent</h1>
       <p class="lead">
-        Bu proqram NextCross sistemindən gələn qəbzləri kassadakı thermal
-        printerə ötürür. Pəncərə bağlansa da agent arxa planda işləməyə davam
-        edir və kompüter açılanda avtomatik başlayır.
+        Bu proqram NextCross sisteminden gelen qebzleri kassadaki thermal
+        printere oturur. Pencere baglansa da agent arxa planda islemeye davam
+        edir ve komputer acilanda avtomatik baslayir.
       </p>
 
-      <div class="status">
-        <span id="agent-dot" class="dot"></span>
-        <div>
-          <div id="agent-title" class="title">Status yoxlanılır...</div>
-          <div id="agent-note" class="note">Çap servisi hazırlanır.</div>
+      <div class="status-list">
+        <div class="status">
+          <span id="agent-dot" class="dot"></span>
+          <div>
+            <div id="agent-title" class="title">Status yoxlanilir...</div>
+            <div id="agent-note" class="note">Cap servisi hazirlanir.</div>
+          </div>
+        </div>
+
+        <div class="status">
+          <span id="update-dot" class="dot"></span>
+          <div>
+            <div id="update-title" class="title">Update yoxlanilir...</div>
+            <div id="update-note" class="note">GitHub Releases statusu oxunur.</div>
+            <div class="actions">
+              <button id="check-update-button" type="button">Update yoxla</button>
+              <button id="install-update-button" class="primary" type="button" disabled>
+                Qur ve restart et
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </main>
 
     <script>
       const agentDot = document.getElementById("agent-dot");
+      const updateDot = document.getElementById("update-dot");
+      const checkUpdateButton = document.getElementById("check-update-button");
+      const installUpdateButton = document.getElementById(
+        "install-update-button",
+      );
 
       function setText(id, value) {
         document.getElementById(id).textContent =
           value === undefined || value === null || value === "" ? "-" : value;
       }
 
-      function setDot(state) {
-        agentDot.className = `dot ${state}`;
+      function setDot(dot, state) {
+        dot.className = `dot ${state}`;
+      }
+
+      function updateUi(status) {
+        if (!status) {
+          return;
+        }
+
+        const state = status.state || "idle";
+        const ready = state === "ready";
+        const failed = state === "error";
+        const inactive = state === "disabled" || state === "current";
+        const dotState = failed ? "bad" : ready || inactive ? "ok" : "info";
+        const versionNote = status.availableVersion
+          ? `Cari versiya: ${status.version}. Yeni versiya: ${status.availableVersion}.`
+          : `Cari versiya: ${status.version}.`;
+
+        setDot(updateDot, dotState);
+        setText("update-title", status.message || "Update statusu hazirdir");
+        setText("update-note", versionNote);
+        installUpdateButton.disabled = !ready;
       }
 
       async function loadStatus() {
@@ -137,24 +219,40 @@
           const status = await window.nextcrossAgent.getStatus();
 
           if (status.bridge.ok) {
-            setDot("ok");
-            setText("agent-title", "Agent işləyir");
+            setDot(agentDot, "ok");
+            setText("agent-title", "Agent isleyir");
             setText(
               "agent-note",
-              "Qəbz çapları qəbul olunur. Bu pəncərəni bağlaya bilərsiniz.",
+              "Qebz caplari qebul olunur. Bu pencereni baglaya bilersiniz.",
             );
           } else {
-            setDot("bad");
+            setDot(agentDot, "bad");
             setText("agent-title", "Agent cavab vermir");
-            setText("agent-note", status.bridge.error || "Health alınmadı");
+            setText("agent-note", status.bridge.error || "Health alinmadi");
           }
+
+          updateUi(status.update);
         } catch (error) {
-          setDot("bad");
-          setText("agent-title", "Status oxunmadı");
+          setDot(agentDot, "bad");
+          setText("agent-title", "Status oxunmadi");
           setText("agent-note", error?.message || String(error));
         }
       }
 
+      checkUpdateButton.addEventListener("click", async () => {
+        checkUpdateButton.disabled = true;
+        try {
+          updateUi(await window.nextcrossAgent.checkForUpdates());
+        } finally {
+          checkUpdateButton.disabled = false;
+        }
+      });
+
+      installUpdateButton.addEventListener("click", () => {
+        window.nextcrossAgent.installUpdate();
+      });
+
+      window.nextcrossAgent.onUpdateStatus(updateUi);
       loadStatus();
       setInterval(loadStatus, 5000);
     </script>

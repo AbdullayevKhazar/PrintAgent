@@ -8,6 +8,7 @@
     "start": "node scripts/start-electron.js",
     "package:win": "node scripts/package-win.js",
     "dist:win": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& electron-builder --win nsis&& node scripts/clean-dist.js",
+    "release:win": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& electron-builder --win nsis --publish always",
     "startup:install": "node scripts/startup.js install",
     "startup:uninstall": "node scripts/startup.js uninstall",
     "startup:status": "node scripts/startup.js status",
@@ -18,6 +19,7 @@
     "appId": "az.nextcross.printer-agent",
     "productName": "Printer Agent",
     "asar": false,
+    "icon": "icon/image.ico",
     "directories": {
       "output": "dist"
     },
@@ -29,6 +31,13 @@
       "package.json",
       "docs/**/*",
       "local-print-agent/**/*"
+    ],
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "AbdullayevKhazar",
+        "repo": "PrinterAgent"
+      }
     ],
     "win": {
       "signAndEditExecutable": false,
@@ -55,5 +64,8 @@
   "devDependencies": {
     "electron": "^42.3.0",
     "electron-builder": "^26.8.1"
+  },
+  "dependencies": {
+    "electron-updater": "^6.8.3"
   }
 }

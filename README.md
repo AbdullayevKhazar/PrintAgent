@@ -1,57 +1,73 @@
 # PrinterAgent
 
-PrinterAgent Windows ucun printer agent proqramidir. Proqram kompüterdə işləyir və sistemdəki printerlə əlaqə qurmaq üçün istifadə olunur.
+PrinterAgent Windows ucun NextCross printer agent proqramidir. Proqram
+komputerde arxa planda isleyir, sistemdeki thermal printerle elaqe qurur ve
+GitHub Releases uzerinden avtomatik update ala bilir.
 
 ## Yukleme
 
-Hazir `.exe` faylini GitHub Releases bolmesinden yukleyin:
+Istifadeci proqrami yalniz ilk defe GitHub Releases bolmesinden qurur:
 
-[PrinterAgent.exe yukle](https://github.com/USERNAME/PrinterAgent/releases/latest/download/PrinterAgent.exe)
+[Printer Agent Setup yukle](https://github.com/AbdullayevKhazar/PrinterAgent/releases/latest)
 
-> Qeyd: `USERNAME` hissəsini öz GitHub istifadəçi adınızla dəyişin. Məsələn: `https://github.com/abdul/PrinterAgent/releases/latest/download/PrinterAgent.exe`
+Sonraki versiyalarda `.exe` faylini yeniden el ile yuklemek lazim deyil. Yeni
+release cixanda proqram update-i avtomatik yoxlayir, yukleyir ve qurasdirmaq
+ucun restart teleb edir.
 
 ## Qurasdirma
 
-1. Yuxaridaki linkden `PrinterAgent.exe` faylini yukleyin.
-2. Yuklenen fayli acin.
-3. Windows icaze sorusarsa, `Run anyway` və ya `Yes` secin.
-4. Proqram acildiqdan sonra printerinizi secin.
-5. Lazim olan melumatlari daxil edib agenti isledin.
+1. Latest release sehifesinden `Printer Agent Setup` faylini yukleyin.
+2. Installer-i acin.
+3. Windows icaze sorusarsa, `Run anyway` ve ya `Yes` secin.
+4. Proqram acilanda agent arxa planda islemeye baslayacaq.
+5. Komputer yeniden acilanda agent avtomatik start olacaq.
 
-## GitHub-a yukleme qaydasi
+## Avtomatik Release Qaydasi
 
-Layiheni GitHub-a gondermek ucun terminalda bu komandalar isledile biler:
+Manual `.exe` upload etmeyin. Yeni versiya ucun:
 
 ```bash
-git init
-git add .
-git commit -m "Initial release"
-git branch -M main
-git remote add origin https://github.com/USERNAME/PrinterAgent.git
-git push -u origin main
+npm version patch
+git push
+git push --tags
 ```
 
-`USERNAME` hissəsini öz GitHub istifadəçi adınızla dəyişin.
+Tag `v*` formatinda push olunanda GitHub Actions Windows build yaradacaq ve
+GitHub Release-e installer, `latest.yml` ve update metadata fayllarini avtomatik
+yukleyecek. `latest.yml` fayli auto-update ucun vacibdir.
 
-## `.exe` faylini Release kimi elave etmek
+## Lokal Build
 
-1. GitHub-da repo səhifəsini açın.
-2. Sağ tərəfdən `Releases` bölməsinə daxil olun.
-3. `Create a new release` düyməsinə klik edin.
-4. `Tag version` olaraq məsələn `v1.0.0` yazın.
-5. `PrinterAgent.exe` faylını ora əlavə edin.
-6. `Publish release` düyməsinə klik edin.
+Installer-i lokal yaratmaq ucun:
 
-Bundan sonra README-dəki yükləmə linki işləyəcək.
+```bash
+npm run dist:win
+```
+
+Release-e publish etmek ucun GitHub Actions istifade edin. Lokal publish lazim
+olarsa, `GH_TOKEN` set olunmalidir:
+
+```bash
+npm run release:win
+```
 
 ## Istifade
 
-Proqram işə düşdükdən sonra arxa planda işləyir. Əgər printerlə bağlı problem yaranarsa:
+Proqram ise dusdukden sonra arxa planda isleyir. Pencere baglansa da agent
+baglanmir. Problem yaranarsa:
 
-- Printerin kompüterə qoşulu olduğundan əmin olun.
-- Printer driver-inin quraşdırıldığını yoxlayın.
-- PrinterAgent proqramını bağlayıb yenidən açın.
+- Printerin komputere qosulu oldugundan emin olun.
+- Printer driver-inin qurasdirildigini yoxlayin.
+- PrinterAgent proqramini baglayib yeniden acin.
+- Dashboard-da update ve agent statusunu yoxlayin.
 
-## Elaqe
+## GitHub Repo
 
-Problem və ya təklif olduqda GitHub repo üzərindən `Issues` bölməsində yaza bilərsiniz.
+Build config hazirda bu repo ucun qurulub:
+
+```text
+AbdullayevKhazar/PrinterAgent
+```
+
+Repo adi ve ya owner deyisirse, `package.json` daxilindeki `build.publish`
+bolmesini yenileyin.

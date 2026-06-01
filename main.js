@@ -1,7 +1,8 @@
 import electron from "electron";
+import electronUpdater from "electron-updater";
 import { spawn } from "node:child_process";
 import { readFileSync } from "node:fs";
-import path from "node:path";
+import path, { dirname } from "node:path";
 import { setTimeout as delay } from "node:timers/promises";
 import { fileURLToPath } from "node:url";
 import {
@@ -11,6 +12,7 @@ import {
 
 const { app, BrowserWindow, dialog, shell, Menu, Tray, nativeImage } = electron;
 const { ipcMain } = electron;
+const { autoUpdater } = electronUpdater;
 
 loadEnvFile(new URL("./local-print-agent/.env", import.meta.url));
 
@@ -41,6 +43,7 @@ const VITE_ENTRY = path.join(
   "vite.js",
 );
 const VITE_ARGS = ["--host", "127.0.0.1", "--port", "5173", "--strictPort"];
+const UPDATE_CHECK_INTERVAL_MS = 30 * 60 * 1000;
 
 let frontendProcess = null;
 let printAgentStartPromise = null;
@@ -57,6 +60,17 @@ let autoStartStatus = {
   supported: process.platform === "win32",
   error: "",
 };
+let updateStatus = {
+  state: app.isPackaged ? "idle" : "disabled",
+  message: app.isPackaged
+    ? "Update check has not started yet"
+    : "Auto update works only in the installed app",
+  version: app.getVersion(),
+  availableVersion: "",
+  percent: 0,
+};
+let updateReadyToInstall = false;
+let updateInstallPromptShown = false;
 
 async function startFrontendDevServer() {
   if (await isUrlReady(TEST_URL)) {
@@ -155,6 +169,7 @@ function createWindow(options = {}) {
     show: shouldShow,
     autoHideMenuBar: true,
     backgroundColor: "#ffffff",
+    icon: path.join(process.cwd(), "icon", "image.ico"),
     webPreferences: {
       preload: PRELOAD_ENTRY,
       contextIsolation: true,
@@ -319,6 +334,22 @@ function setTrayStatus(status) {
   updateTrayMenu();
 }
 
+function setUpdateStatus(status) {
+  updateStatus = {
+    ...updateStatus,
+    ...status,
+    version: app.getVersion(),
+  };
+
+  updateTrayMenu();
+
+  for (const window of BrowserWindow.getAllWindows()) {
+    if (!window.isDestroyed()) {
+      window.webContents.send("agent:update-status", updateStatus);
+    }
+  }
+}
+
 function updateTrayMenu() {
   if (!tray) {
     return;
@@ -350,10 +381,24 @@ function updateTrayMenu() {
         label: `Auto start: ${autoStartStatus.enabled ? "On" : "Off"}`,
         enabled: false,
       },
+      {
+        label: `Update: ${updateStatus.message}`,
+        enabled: false,
+      },
       { type: "separator" },
       {
         label: "Open Dashboard",
         click: () => openDashboard(),
+      },
+      {
+        label: "Check for Updates",
+        enabled: app.isPackaged,
+        click: () => checkForUpdates(),
+      },
+      {
+        label: "Install Downloaded Update",
+        enabled: updateReadyToInstall,
+        click: () => installDownloadedUpdate(),
       },
       {
         label: "Open Print Bridge Health",
@@ -446,6 +491,128 @@ function configureAutoStart() {
   }
 }
 
+function configureAutoUpdater() {
+  if (!app.isPackaged) {
+    setUpdateStatus({
+      state: "disabled",
+      message: "Auto update works only in the installed app",
+    });
+    return;
+  }
+
+  autoUpdater.autoDownload = true;
+  autoUpdater.autoInstallOnAppQuit = true;
+
+  autoUpdater.on("checking-for-update", () => {
+    setUpdateStatus({
+      state: "checking",
+      message: "Checking for updates",
+      percent: 0,
+    });
+  });
+
+  autoUpdater.on("update-available", (info) => {
+    setUpdateStatus({
+      state: "available",
+      message: `Downloading version ${info.version}`,
+      availableVersion: info.version,
+      percent: 0,
+    });
+  });
+
+  autoUpdater.on("update-not-available", () => {
+    setUpdateStatus({
+      state: "current",
+      message: "App is up to date",
+      availableVersion: "",
+      percent: 0,
+    });
+  });
+
+  autoUpdater.on("download-progress", (progress) => {
+    const percent = Math.round(progress.percent || 0);
+    setUpdateStatus({
+      state: "downloading",
+      message: `Downloading update ${percent}%`,
+      percent,
+    });
+  });
+
+  autoUpdater.on("update-downloaded", (info) => {
+    updateReadyToInstall = true;
+    setUpdateStatus({
+      state: "ready",
+      message: `Version ${info.version} is ready to install`,
+      availableVersion: info.version,
+      percent: 100,
+    });
+    promptInstallDownloadedUpdate(info.version);
+  });
+
+  autoUpdater.on("error", (error) => {
+    setUpdateStatus({
+      state: "error",
+      message: error instanceof Error ? error.message : String(error),
+      percent: 0,
+    });
+  });
+}
+
+async function checkForUpdates() {
+  if (!app.isPackaged) {
+    setUpdateStatus({
+      state: "disabled",
+      message: "Auto update works only in the installed app",
+    });
+    return updateStatus;
+  }
+
+  try {
+    await autoUpdater.checkForUpdates();
+  } catch (error) {
+    setUpdateStatus({
+      state: "error",
+      message: error instanceof Error ? error.message : String(error),
+      percent: 0,
+    });
+  }
+
+  return updateStatus;
+}
+
+function promptInstallDownloadedUpdate(version) {
+  if (updateInstallPromptShown) {
+    return;
+  }
+
+  updateInstallPromptShown = true;
+  const focusedWindow = BrowserWindow.getFocusedWindow();
+  const result = dialog.showMessageBoxSync(focusedWindow ?? undefined, {
+    type: "info",
+    buttons: ["Restart and Install", "Later"],
+    defaultId: 0,
+    cancelId: 1,
+    title: "Printer Agent update ready",
+    message: `Printer Agent ${version} is ready to install.`,
+    detail:
+      "Restart secilende proqram baglanacaq, update qurulacaq ve yeniden acilacaq.",
+  });
+
+  if (result === 0) {
+    installDownloadedUpdate();
+  }
+}
+
+function installDownloadedUpdate() {
+  if (!updateReadyToInstall) {
+    return false;
+  }
+
+  isQuitting = true;
+  autoUpdater.quitAndInstall(false, true);
+  return true;
+}
+
 function getPrinterNameLabel() {
   return (
     readOptionalEnv("PRINT_AGENT_PRINTER_NAME") ||
@@ -485,6 +652,7 @@ async function getDashboardStatus() {
     platform: process.platform,
     bridge: await getBridgeHealthStatus(),
     autoStart: autoStartStatus,
+    update: updateStatus,
     frontend: {
       enabled: readBooleanEnv("NEXTCROSS_START_FRONTEND", false),
       testUrl: TEST_URL,
@@ -530,6 +698,9 @@ function parseJson(text) {
 }
 
 ipcMain.handle("agent:get-status", () => getDashboardStatus());
+ipcMain.handle("agent:get-update-status", () => updateStatus);
+ipcMain.handle("agent:check-for-updates", () => checkForUpdates());
+ipcMain.handle("agent:install-update", () => installDownloadedUpdate());
 ipcMain.handle("agent:open-test-page", () => {
   openTestPage();
 });
@@ -543,6 +714,7 @@ ipcMain.handle("agent:open-printers-json", () => {
 app.whenReady().then(async () => {
   try {
     configureAutoStart();
+    configureAutoUpdater();
     createTray();
     setTrayStatus({ state: "starting", message: "Starting services" });
     await startEmbeddedPrintAgent();
@@ -561,6 +733,11 @@ app.whenReady().then(async () => {
     } else {
       createWindow({ show: false });
     }
+
+    await checkForUpdates();
+    setInterval(() => {
+      checkForUpdates();
+    }, UPDATE_CHECK_INTERVAL_MS);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
     dialog.showErrorBox("Electron start failed", message);
