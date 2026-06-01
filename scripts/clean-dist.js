@@ -6,7 +6,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, "..");
 const distDir = path.join(projectRoot, "dist");
-const setupInstallerPattern = /^Printer Agent-Setup-.*\.exe$/;
+const setupInstallerPattern = /^.+-Setup-\d+\.\d+\.\d+.*\.exe$/;
 
 await cleanDist();
 

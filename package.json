@@ -1,5 +1,5 @@
 {
-  "name": "printer-agent",
+  "name": "nextcore-printer-agent",
   "version": "0.1.2",
   "private": true,
   "type": "module",
@@ -17,7 +17,7 @@
   },
   "build": {
     "appId": "az.nextcross.printer-agent",
-    "productName": "Printer Agent",
+    "productName": "NextCorePrinterAgent",
     "asar": false,
     "icon": "icon/image.ico",
     "directories": {
