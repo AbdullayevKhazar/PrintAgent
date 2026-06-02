@@ -52,7 +52,7 @@
       ]
     },
     "nsis": {
-      "artifactName": "${productName}-Setup-${version}.${ext}",
+      "artifactName": "${productName}-Setup.${ext}",
       "oneClick": false,
       "perMachine": false,
       "allowElevation": true,
