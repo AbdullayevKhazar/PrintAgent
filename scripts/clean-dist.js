@@ -10,7 +10,7 @@ const packageJsonPath = path.join(projectRoot, "package.json");
 const packageMetadata = JSON.parse(await fs.readFile(packageJsonPath, "utf8"));
 const productName =
   packageMetadata.build?.productName || packageMetadata.name || "app";
-const currentSetupInstaller = `${productName}-Setup-${packageMetadata.version}.exe`;
+const currentSetupInstaller = `${productName}-Setup.exe`;
 const currentBlockMap = `${currentSetupInstaller}.blockmap`;
 const keptDistFiles = new Set([
   currentSetupInstaller,
