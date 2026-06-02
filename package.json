@@ -7,8 +7,9 @@
   "scripts": {
     "start": "node scripts/start-electron.js",
     "package:win": "node scripts/package-win.js",
-    "dist:win": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& electron-builder --win nsis --publish never&& node scripts/clean-dist.js",
-    "release:win": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& electron-builder --win nsis --publish always",
+    "prepare:icon": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/generate-icon.ps1",
+    "dist:win": "npm run prepare:icon&& set CSC_IDENTITY_AUTO_DISCOVERY=false&& electron-builder --win nsis --publish never&& node scripts/clean-dist.js",
+    "release:win": "npm run prepare:icon&& set CSC_IDENTITY_AUTO_DISCOVERY=false&& electron-builder --win nsis --publish always",
     "startup:install": "node scripts/startup.js install",
     "startup:uninstall": "node scripts/startup.js uninstall",
     "startup:status": "node scripts/startup.js status",
