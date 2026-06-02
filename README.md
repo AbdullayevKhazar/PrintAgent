@@ -8,7 +8,7 @@ GitHub Releases uzerinden avtomatik update ala bilir.
 
 Istifadeci proqrami yalniz ilk defe GitHub Releases bolmesinden qurur:
 
-[Printer Agent Setup yukle](https://github.com/AbdullayevKhazar/PrinterAgent/releases/latest)
+[Printer Agent Setup yukle](https://github.com/AbdullayevKhazar/PrintAgent/releases/download/v0.1.0/NextCorePrinterAgent-Setup-0.1.8.exe)
 
 Sonraki versiyalarda `.exe` faylini yeniden el ile yuklemek lazim deyil. Yeni
 release cixanda proqram update-i avtomatik yoxlayir, yukleyir ve qurasdirmaq
