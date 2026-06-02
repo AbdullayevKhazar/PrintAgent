@@ -9,7 +9,7 @@ const execFileAsync = promisify(execFile);
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, "..");
-const appName = "NextCross Test Agent";
+const appName = "NextCore Printer Agent";
 const exePath = path.join(projectRoot, "release", appName, `${appName}.exe`);
 const startupDir = path.join(
   process.env.APPDATA || path.join(os.homedir(), "AppData", "Roaming"),
@@ -51,7 +51,7 @@ $Shortcut.TargetPath = $TargetPath
 $Shortcut.Arguments = "-- --background"
 $Shortcut.WorkingDirectory = $WorkingDirectory
 $Shortcut.WindowStyle = 7
-$Shortcut.Description = "Starts NextCross local thermal print agent"
+$Shortcut.Description = "Starts NextCore local thermal print agent"
 $Shortcut.Save()
 Write-Output $ShortcutPath
 `;

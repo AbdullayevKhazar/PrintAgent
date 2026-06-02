@@ -7,7 +7,7 @@ const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, "..");
 const electronDist = path.join(projectRoot, "node_modules", "electron", "dist");
 const releaseRoot = path.join(projectRoot, "release");
-const appName = "NextCross Test Agent";
+const appName = "NextCore Printer Agent";
 const outputDir = path.join(releaseRoot, appName);
 const resourcesAppDir = path.join(outputDir, "resources", "app");
 const exePath = path.join(outputDir, `${appName}.exe`);
@@ -40,7 +40,9 @@ async function recreateOutputDir() {
     const resolvedOutputDir = await fs.realpath(outputDir);
 
     if (!isInside(resolvedOutputDir, resolvedProjectRoot)) {
-      throw new Error(`Refusing to remove outside project: ${resolvedOutputDir}`);
+      throw new Error(
+        `Refusing to remove outside project: ${resolvedOutputDir}`,
+      );
     }
 
     await fs.rm(resolvedOutputDir, { recursive: true, force: true });
@@ -61,9 +63,13 @@ async function copyProjectFile(relativePath) {
 }
 
 async function copyProjectDirectory(relativePath) {
-  await fs.cp(path.join(projectRoot, relativePath), path.join(resourcesAppDir, relativePath), {
-    recursive: true,
-  });
+  await fs.cp(
+    path.join(projectRoot, relativePath),
+    path.join(resourcesAppDir, relativePath),
+    {
+      recursive: true,
+    },
+  );
 }
 
 async function writePackagedReadme() {
@@ -77,8 +83,8 @@ async function writePackagedReadme() {
       "",
       "The app starts the embedded local print agent automatically.",
       "The first window is a status dashboard for health, printers, and queue state.",
-      "By default it also starts NextCross-Admin from:",
-      "C:\\Users\\abdul\\Desktop\\NextCross-Admin",
+      "By default it also starts NextCore-Admin from:",
+      "C:\\Users\\abdul\\Desktop\\NextCore-Admin",
       "",
       "Printer settings are read from:",
       "resources\\app\\local-print-agent\\.env",
@@ -98,5 +104,9 @@ async function assertExists(filePath) {
 
 function isInside(childPath, parentPath) {
   const relative = path.relative(parentPath, childPath);
-  return Boolean(relative) && !relative.startsWith("..") && !path.isAbsolute(relative);
+  return (
+    Boolean(relative) &&
+    !relative.startsWith("..") &&
+    !path.isAbsolute(relative)
+  );
 }
