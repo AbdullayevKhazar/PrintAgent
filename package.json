@@ -19,7 +19,6 @@
     "appId": "az.nextcross.printer-agent",
     "productName": "NextCorePrinterAgent",
     "asar": false,
-    "icon": "icon/image.ico",
     "directories": {
       "output": "dist"
     },
