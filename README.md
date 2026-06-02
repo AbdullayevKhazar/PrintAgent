@@ -1,4 +1,4 @@
-# PrinterAgent
+# NextCorePrinterAgent
 
 PrinterAgent Windows ucun NextCross printer agent proqramidir. Proqram
 komputerde arxa planda isleyir, sistemdeki thermal printerle elaqe qurur ve
