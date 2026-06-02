@@ -7,7 +7,7 @@
   "scripts": {
     "start": "node scripts/start-electron.js",
     "package:win": "node scripts/package-win.js",
-    "dist:win": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& electron-builder --win nsis&& node scripts/clean-dist.js",
+    "dist:win": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& electron-builder --win nsis --publish never&& node scripts/clean-dist.js",
     "release:win": "set CSC_IDENTITY_AUTO_DISCOVERY=false&& electron-builder --win nsis --publish always",
     "startup:install": "node scripts/startup.js install",
     "startup:uninstall": "node scripts/startup.js uninstall",

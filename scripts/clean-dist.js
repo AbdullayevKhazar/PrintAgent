@@ -6,7 +6,17 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const projectRoot = path.resolve(__dirname, "..");
 const distDir = path.join(projectRoot, "dist");
-const setupInstallerPattern = /^.+-Setup-\d+\.\d+\.\d+.*\.exe$/;
+const packageJsonPath = path.join(projectRoot, "package.json");
+const packageMetadata = JSON.parse(await fs.readFile(packageJsonPath, "utf8"));
+const productName =
+  packageMetadata.build?.productName || packageMetadata.name || "app";
+const currentSetupInstaller = `${productName}-Setup-${packageMetadata.version}.exe`;
+const currentBlockMap = `${currentSetupInstaller}.blockmap`;
+const keptDistFiles = new Set([
+  currentSetupInstaller,
+  currentBlockMap,
+  "latest.yml",
+]);
 
 await cleanDist();
 
@@ -25,7 +35,7 @@ async function cleanDist() {
   }
 
   for (const entry of entries) {
-    if (entry.isFile() && setupInstallerPattern.test(entry.name)) {
+    if (entry.isFile() && keptDistFiles.has(entry.name)) {
       continue;
     }
 

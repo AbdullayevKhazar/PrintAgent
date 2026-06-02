@@ -25,7 +25,13 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Publish Windows release
-        run: npm run release:win
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build Windows installer
+        run: npm run dist:win
+
+      - name: Publish GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/*.exe
+            dist/*.exe.blockmap
+            dist/latest.yml
