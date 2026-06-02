@@ -35,6 +35,7 @@ const PRINT_AGENT_ENTRY = new URL(
 );
 const DASHBOARD_ENTRY = new URL("./dashboard.html", import.meta.url);
 const PRELOAD_ENTRY = fileURLToPath(new URL("./preload.cjs", import.meta.url));
+const APP_ICON_PATH = path.join(app.getAppPath(), "icon", "image.ico");
 const VITE_ENTRY = path.join(
   ADMIN_DIR,
   "node_modules",
@@ -169,7 +170,7 @@ function createWindow(options = {}) {
     show: shouldShow,
     autoHideMenuBar: true,
     backgroundColor: "#ffffff",
-    icon: path.join(process.cwd(), "icon", "image.ico"),
+    icon: APP_ICON_PATH,
     webPreferences: {
       preload: PRELOAD_ENTRY,
       contextIsolation: true,

@@ -28,6 +28,7 @@
       "dashboard.html",
       "print-queue-worker.js",
       "package.json",
+      "icon/**/*",
       "docs/**/*",
       "local-print-agent/**/*"
     ],
@@ -39,6 +40,7 @@
       }
     ],
     "win": {
+      "icon": "icon/image.ico",
       "signAndEditExecutable": false,
       "target": [
         {
