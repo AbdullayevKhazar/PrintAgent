@@ -66,7 +66,7 @@ baglanmir. Problem yaranarsa:
 Build config hazirda bu repo ucun qurulub:
 
 ```text
-AbdullayevKhazar/PrinterAgent
+AbdullayevKhazar/PrintAgent
 ```
 
 Repo adi ve ya owner deyisirse, `package.json` daxilindeki `build.publish`
