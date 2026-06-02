@@ -59,6 +59,7 @@
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
+      "shortcutName": "NextCore Print",
       "runAfterFinish": true
     }
   },
